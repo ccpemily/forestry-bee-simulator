@@ -1,5 +1,5 @@
-import { randomBoolean } from "../common/utils";
-import { AlleleType, Alleles, IAllele } from "./allele";
+import { randomBoolean } from "../common/utils.ts";
+import { AlleleType, IAllele } from "./allele.ts";
 
 export type ChromosomeType = 'species' | 'lifetime' | 'speed' | 'fertility' | 'flowers' | 'flowering' | 'territory' | 'effect' |
     'temperature_tol' | 'humidity_tol' | 'nocturnal' | 'rain_tolerance' | 'cave_dwelling'

@@ -1,7 +1,7 @@
-import { translate } from './common/locale';
-import { Allele, IAllele } from './genetics/allele';
-import { BeeSpecies } from './genetics/allelevalues';
-import { BeeGenome, IGenome, BeeChromosomeType  } from './genetics/genome';
+import { translate } from './common/locale.ts';
+import { AlleleType, IAllele } from './genetics/allele.ts';
+import { ChromosomeType } from './genetics/chromosome.ts';
+import { BeeGenome, IGenome, BeeChromosomeType, AlleleTemplate  } from './genetics/genome.ts';
 
 export class Bee {
     genome: IGenome<BeeChromosomeType>
@@ -54,4 +54,113 @@ export class BeePrincess extends Bee{
     }
 }
 
-export { BeeSpecies };
+export function calcGenomeSimilarity(bee: Bee, template: AlleleTemplate<BeeChromosomeType> | Bee): number {
+    let s = 0
+    let k: BeeChromosomeType
+    let chromosomes = bee.genome.chromosomes
+    if('genome' in template){
+        let temps = template.genome.chromosomes
+        for(k in chromosomes){
+            s += chromosomes[k].active.id == temps[k].active.id ? chromosomes[k].inactive.id == temps[k].active.id ? 2 : 1 : 0
+        }
+    }
+    else {
+        for(k in chromosomes){
+            if(k in template){
+                s += chromosomes[k].active.id == template[k]().id ? 1 : 0
+                s += chromosomes[k].inactive.id == template[k]().id ? 1 : 0
+            }
+            else {
+                s += 2
+            }
+        }
+    }
+    return s
+}
+
+export function containsAllele(bee: Bee, allele: IAllele<any>){
+    let k: ChromosomeType
+    for(k in bee.genome.chromosomes){
+        let chromosome = bee.genome.chromosomes[k]
+        if((chromosome.active.type == allele.type && chromosome.active.id == allele.id) || (chromosome.inactive.type == allele.type && chromosome.inactive.id == allele.id)){
+            return true
+        }
+    }
+    return false
+}
+
+export function containsTemplate(bee: Bee, template: AlleleTemplate<BeeChromosomeType>){
+    let k: ChromosomeType
+    for(k in bee.genome.chromosomes){
+        let chromosome = bee.genome.chromosomes[k]
+        if(k in template){
+            if((chromosome.active.id != template[k]().id) && (chromosome.inactive.id != template[k]().id)){
+                return false
+            }
+        }
+    }
+    return true
+}
+
+export function containsPureTemplate(bee: Bee, template: AlleleTemplate<BeeChromosomeType>){
+    let k: ChromosomeType
+    for(k in bee.genome.chromosomes){
+        let chromosome = bee.genome.chromosomes[k]
+        if(k in template){
+            if((chromosome.active.id != template[k]().id) || (chromosome.inactive.id != template[k]().id)){
+                return false
+            }
+        }
+    }
+    return true
+}
+
+export function containsPureSourceOrTarget(bee: Bee, source: AlleleTemplate<BeeChromosomeType>, target: AlleleTemplate<BeeChromosomeType>){
+    let k: ChromosomeType
+    for(k in bee.genome.chromosomes){
+        let chromosome = bee.genome.chromosomes[k]
+        if(k in source){
+            if((chromosome.active.id != source[k]().id) || (chromosome.inactive.id != source[k]().id)){
+                if(k in target){
+                    if(((chromosome.active.id != source[k]().id) && (chromosome.active.id != target[k]().id)) || 
+                    ((chromosome.inactive.id != source[k]().id) && (chromosome.inactive.id != target[k]().id))){
+                        return false
+                    }
+                }
+                else {
+                    return false
+                }
+            }
+        }
+    }
+    return true
+}
+
+export function mergeTemplate(source: AlleleTemplate<BeeChromosomeType>, target: AlleleTemplate<BeeChromosomeType>){
+    //let k: ChromosomeType
+    let temp = Object.assign({}, source)
+    for(const k in target){
+        temp[k] = target[k]
+    }
+    return temp
+}
+
+export function templateEquals(source: AlleleTemplate<BeeChromosomeType>, target: AlleleTemplate<BeeChromosomeType>){
+    let k: ChromosomeType
+    for(k in source){
+        if(!(k in target)){
+            return false
+        }
+    }
+    for(k in target){
+        if(k in source){
+            if(target[k]().id != source[k]().id){
+                return false
+            }
+        }
+        else {
+            return false
+        }
+    }
+    return true
+}

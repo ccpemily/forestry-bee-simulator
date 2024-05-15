@@ -1,12 +1,16 @@
-import { Alleles } from "./allele";
-import { Chromosome, ChromosomeType, IAlleleCompatible, IChromosome } from "./chromosome";
+import { Alleles } from "./allele.ts";
+import { Chromosome, ChromosomeType, IAlleleCompatible, IChromosome } from "./chromosome.ts";
+
+export type AlleleTemplate<T extends ChromosomeType> = {[P in T]?: () => IAlleleCompatible<P>}
+export type DefaultTemplate<T extends ChromosomeType> = {[P in T]: IAlleleCompatible<P>}
+export type GenomeContainer<T extends ChromosomeType> = {[P in T]: IChromosome<P>}
 
 export interface IGenome<T extends ChromosomeType> {
-    chromosomes: {[P in T]: IChromosome<P>}
+    chromosomes: GenomeContainer<T>
 
-    get defaultTemplate(): {[P in T]: IAlleleCompatible<P>};
+    get defaultTemplate(): DefaultTemplate<T>;
 
-    applyTemplate(template: {[P in T]?: () => IAlleleCompatible<P>}, index: 0 | 1): void;
+    applyTemplate(template: AlleleTemplate<T>, index: 0 | 1): void;
     inheritWith(genome: IGenome<T>): IGenome<T>;
     getAllele<I extends T>(type: I, active: boolean): IAlleleCompatible<I>
 }
@@ -15,7 +19,7 @@ export type BeeChromosomeType = 'species' | 'lifetime' | 'speed' | 'fertility' |
 'temperature_tol' | 'humidity_tol' | 'nocturnal' | 'rain_tolerance' | 'cave_dwelling'
 
 export class BeeGenome implements IGenome<BeeChromosomeType> {
-    chromosomes: {[P in BeeChromosomeType]: IChromosome<P>}
+    chromosomes: GenomeContainer<BeeChromosomeType>
 
     get defaultTemplate() {
         return {

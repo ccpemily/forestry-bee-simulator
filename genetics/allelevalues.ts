@@ -1,10 +1,12 @@
-import { ChromosomeType, IAlleleCompatible } from "./chromosome";
-import { BeeChromosomeType } from "./genome";
+import { ChromosomeType, IAlleleCompatible } from "./chromosome.ts";
+import { BeeChromosomeType } from "./genome.ts";
+
+export type SpeciesTemplate<T extends ChromosomeType> = {[P in Exclude<T, 'species'>]?: () => IAlleleCompatible<P>}
 
 export class Species<T extends ChromosomeType> {
-    template: {[P in Exclude<T, 'species'>]?: () => IAlleleCompatible<P>}
+    template: SpeciesTemplate<T>
 
-    constructor(template: {[P in Exclude<T, 'species'>]?: () => IAlleleCompatible<P>}){
+    constructor(template: SpeciesTemplate<T>){
         this.template = template
     }
 }

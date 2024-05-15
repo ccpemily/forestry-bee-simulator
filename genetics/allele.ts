@@ -1,6 +1,5 @@
-import { BeeSpecies } from "../bee.ts";
 import { RegistryClass, makeTypedRegistry } from "../common/registry.ts";
-import { EffectProvider, FlowerProvider, Species } from "./allelevalues.ts";
+import { EffectProvider, FlowerProvider, BeeSpecies } from "./allelevalues.ts";
 
 export type AlleleType = 'species' | 'lifetime' | 'speed' | 'fertility' | 'flowers' | 'flowering' | 'territory' | 'effect' | 'tolerance' | 'boolean'
 
@@ -126,7 +125,9 @@ export class Alleles {
     })
 
     static Effect = makeTypedRegistry('effect', {
-        "none": new Allele<'effect'>(new EffectProvider(), true)
+        "none": new Allele<'effect'>(new EffectProvider(), true),
+        "beautific": new Allele<'effect'>(new EffectProvider()),
+        "exploration": new Allele<'effect'>(new EffectProvider())
     })
 
     static Tolerance = makeTypedRegistry('tolerance', {
